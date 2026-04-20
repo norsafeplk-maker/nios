@@ -1,348 +1,113 @@
-:root {
-  --bg-main: #a7a7a7;
-  --glass-bg: rgba(255, 255, 255, 0.12);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --dark-surface: #1d232a;
-  --dark-elevated: #2b313a;
-  --text-primary: #ffffff;
-  --text-secondary: #d3d8df;
-  --text-muted: #8e97a3;
-  --accent-cyan: #27E1D1;
-  --accent-blue: #4A90E2;
-  --danger: #ff4d4d;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: var(--bg-main);
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-.hidden {
-  display: none !important;
-}
-
 #nios-app {
-  min-height: 100vh;
-  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #111;
 }
 
 .nios-shell {
-  max-width: 1480px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 .nios-topbar {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: end;
   gap: 16px;
   margin-bottom: 20px;
-  padding: 18px 20px;
-  border-radius: 22px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.2);
 }
 
 .nios-kicker {
   font-size: 12px;
-  letter-spacing: .12em;
   text-transform: uppercase;
-  color: #2d2d2d;
+  letter-spacing: 0.12em;
+  color: #777;
 }
 
 .nios-title {
   margin: 4px 0 0;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 1.1;
-  color: #111;
 }
 
 .nios-last-updated {
   font-size: 13px;
-  color: #222;
+  color: #666;
 }
 
 .nios-error {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: rgba(255, 77, 77, 0.12);
-  border: 1px solid rgba(255, 77, 77, 0.25);
-  color: #7a0000;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #d33;
+  background: #fff0f0;
+  color: #a00;
+  border-radius: 10px;
+}
+
+.hidden {
+  display: none;
 }
 
 .nios-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
 }
 
-.nios-ticket {
-  padding: 18px;
-  border-radius: 24px;
-  background: rgba(29, 35, 42, 0.9);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: var(--text-primary);
-  backdrop-filter: blur(18px);
-  box-shadow:
-    0 16px 34px rgba(0,0,0,0.32),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-  display: grid;
-  gap: 16px;
+.card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.nios-ticket.is-overdue {
-  border-color: rgba(255, 77, 77, 0.6);
-  box-shadow:
-    0 0 0 1px rgba(255, 77, 77, 0.2),
-    0 0 24px rgba(255, 77, 77, 0.25),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-}
-
-.ticket-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.ticket-so {
-  font-size: 30px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.ticket-customer {
-  margin-top: 6px;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.ticket-sla {
-  align-self: flex-start;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(39,225,209,0.16);
-  border: 1px solid rgba(39,225,209,0.36);
-  color: var(--accent-cyan);
-  font-size: 12px;
+.card .so {
+  font-size: 18px;
   font-weight: 700;
+  margin-bottom: 8px;
 }
 
-.ticket-sla.is-overdue {
-  background: rgba(255,77,77,0.15);
-  border-color: rgba(255,77,77,0.45);
+.card .meta {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.card .badge {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f2f2f2;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.card button {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #111;
   color: #fff;
 }
 
-.ticket-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap: 12px;
-}
-
-.ticket-meta-box {
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.ticket-meta-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-bottom: 6px;
-}
-
-.ticket-meta-value {
-  font-size: 14px;
-  color: var(--text-primary);
-  word-break: break-word;
-}
-
-.ticket-section {
-  display: grid;
-  gap: 10px;
-}
-
-.ticket-section-title {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-}
-
-.ticket-fields {
-  display: grid;
-  gap: 10px;
-}
-
-.ticket-field {
-  display: grid;
-  gap: 6px;
-}
-
-.ticket-field-full {
-  grid-column: 1 / -1;
-}
-
-.ticket-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.ticket-check {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  cursor: pointer;
-}
-
-.ticket-check input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.ticket-check-box {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.22);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ticket-check input:checked + .ticket-check-box {
-  background: var(--accent-cyan);
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 12px rgba(39,225,209,0.35);
-}
-
-.ticket-check-label {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.ticket-textarea,
-.ticket-note {
-  width: 100%;
-  min-height: 84px;
-  resize: vertical;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  padding: 12px;
-  background: rgba(255,255,255,0.05);
-  color: var(--text-primary);
-  font: inherit;
-  outline: none;
-}
-
-.ticket-lines {
-  display: grid;
-  gap: 8px;
-}
-
-.ticket-line-row {
-  display: grid;
-  grid-template-columns: 70px 1fr;
-  gap: 12px;
-  align-items: start;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.ticket-line-qty {
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.ticket-line-item {
-  color: var(--text-secondary);
-}
-
-.ticket-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.ticket-done-btn {
-  border: none;
-  border-radius: 18px;
-  padding: 14px 24px;
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  color: #061014;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
-  box-shadow: 0 10px 24px rgba(39,225,209,0.28);
-}
-
-.ticket-done-btn:disabled {
-  opacity: .6;
+.card button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.ticket-msg {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.ticket-msg.success {
-  color: #8fffd9;
-}
-
-.ticket-msg.error {
-  color: #ff9e9e;
-}
-
-.ticket-empty,
-.ticket-empty-state {
+.nios-loading,
+.nios-empty {
   padding: 18px;
-  border-radius: 16px;
-  text-align: center;
-  color: var(--text-muted);
-  background: rgba(255,255,255,0.04);
-  border: 1px dashed rgba(255,255,255,0.1);
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  color: #666;
 }
 
-@media (max-width: 900px) {
-  .nios-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ticket-meta-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ticket-so {
-    font-size: 24px;
-  }
-
-  .ticket-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .ticket-done-btn {
-    width: 100%;
-  }
+.nios-highlight {
+  outline: 3px solid #2d6cdf;
 }

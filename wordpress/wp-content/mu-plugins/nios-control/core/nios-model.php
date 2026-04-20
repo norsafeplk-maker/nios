@@ -1,79 +1,67 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-function nios_primary_states() {
-    return [
-        'RECEIVING',
-        'QC',
-        'EMBROIDERY',
-        'PRINTING',
-        'SUBLIMATION',
-        'ADJUSTMENTS',
-        'DISPATCH',
-        'COMPLETE',
-        'EXCEPTION',
-    ];
+/**
+ * ============================================
+ * FORCE STORAGE MODEL
+ * ============================================
+ */
+
+function nios_get_orders() {
+    $orders = get_option('nios_orders', []);
+    return is_array($orders) ? $orders : [];
 }
 
-function nios_substates() {
-    return [
-        'RECEIVING' => [
-            'AWAITING_SUPPLIER',
-            'PARTIAL_RECEIVED',
-            'RECEIVED_COMPLETE',
-            'RECEIVING_BLOCKED',
-        ],
-        'QC' => [
-            'AWAITING_QC',
-            'QC_IN_PROGRESS',
-            'QC_PASSED',
-            'QC_BLOCKED',
-        ],
-        'EMBROIDERY' => [
-            'AWAITING_DIGITIZING',
-            'IN_PRODUCTION',
-            'EMB_COMPLETE',
-            'EMB_BLOCKED',
-        ],
-        'PRINTING' => [
-            'AWAITING_ARTWORK',
-            'IN_PRINT',
-            'PRINT_COMPLETE',
-            'PRINT_BLOCKED',
-        ],
-        'SUBLIMATION' => [
-            'AWAITING_DESIGN',
-            'IN_SUBLIMATION',
-            'SUBLIMATION_COMPLETE',
-            'SUB_BLOCKED',
-        ],
-        'ADJUSTMENTS' => [
-            'AWAITING_ALTERATION',
-            'IN_ALTERATION',
-            'ALTERATION_COMPLETE',
-            'ADJUSTMENT_BLOCKED',
-        ],
-        'DISPATCH' => [
-            'AWAITING_PACK',
-            'PACKING',
-            'READY_FOR_DISPATCH',
-            'DISPATCHED',
-        ],
-        'COMPLETE' => [
-            'DELIVERED',
-            'INVOICED',
-            'PAID',
-            'CLOSED',
-        ],
-        'EXCEPTION' => [
-            'DATA_ERROR',
-            'SYSTEM_MISMATCH',
-            'MANUAL_OVERRIDE',
-        ],
-    ];
+function nios_save_orders(array $orders) {
+    update_option('nios_orders', array_values($orders), false);
 }
 
-function nios_get_substates($state) {
-    $map = nios_substates();
-    return $map[$state] ?? [];
+/**
+ * 🔴 HARD SAVE FUNCTION
+ */
+function nios_ingest_orders(array $incomingOrders) {
+
+    $existing = nios_get_orders();
+
+    foreach ($incomingOrders as $incoming) {
+
+        if (!is_array($incoming)) continue;
+
+        $so = strtoupper(trim((string)($incoming['so_number'] ?? '')));
+
+        if ($so === '') continue;
+
+        // 🔴 CREATE ORDER STRUCTURE
+        $order = [
+            'so_number' => $so,
+            'customer' => $incoming['customer'] ?? '',
+            'lines' => $incoming['lines'] ?? [],
+            'state' => 'RECEIVING',
+            'substate' => 'AWAITING_SUPPLIER',
+            'current_action' => 'RECEIVE_GOODS',
+            'owner' => 'receiving@norsafe.co.za',
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ];
+
+        // 🔴 REPLACE OR ADD
+        $found = false;
+
+        foreach ($existing as $i => $ex) {
+            if (($ex['so_number'] ?? '') === $so) {
+                $existing[$i] = $order;
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            $existing[] = $order;
+        }
+    }
+
+    // 🔴 FORCE SAVE
+    update_option('nios_orders', $existing, false);
+
+    return count($incomingOrders);
 }

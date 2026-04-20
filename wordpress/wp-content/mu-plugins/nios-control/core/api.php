@@ -1,16 +1,16 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
+/**
+ * ============================================
+ * REGISTER ROUTES
+ * ============================================
+ */
 add_action('rest_api_init', function () {
+
     register_rest_route('nios/v1', '/order', [
         'methods'  => 'POST',
         'callback' => 'nios_api_ingest_orders',
-        'permission_callback' => '__return_true',
-    ]);
-
-    register_rest_route('nios/v1', '/dashboard', [
-        'methods'  => 'GET',
-        'callback' => 'nios_api_dashboard_all',
         'permission_callback' => '__return_true',
     ]);
 
@@ -19,78 +19,72 @@ add_action('rest_api_init', function () {
         'callback' => 'nios_api_dashboard_state',
         'permission_callback' => '__return_true',
     ]);
-
-    register_rest_route('nios/v1', '/debug-orders', [
-        'methods'  => 'GET',
-        'callback' => 'nios_api_debug_orders',
-        'permission_callback' => '__return_true',
-    ]);
 });
 
+/**
+ * ============================================
+ * AUTH
+ * ============================================
+ */
 function nios_api_require_key(WP_REST_Request $request) {
     $key = (string) $request->get_header('X-NIOS-KEY');
-    return hash_equals(nios_api_key(), $key);
+    return hash_equals('test123', $key);
 }
 
+/**
+ * ============================================
+ * 🔴 INGEST (THIS MUST FIRE)
+ * ============================================
+ */
 function nios_api_ingest_orders(WP_REST_Request $request) {
+
     if (!nios_api_require_key($request)) {
-        return new WP_REST_Response(['status' => 'error', 'message' => 'Unauthorized'], 403);
+        return new WP_REST_Response([
+            'status' => 'error',
+            'message' => 'Unauthorized'
+        ], 403);
     }
 
     $body = $request->get_json_params();
-    $orders = isset($body['orders']) && is_array($body['orders']) ? $body['orders'] : [];
 
-    nios_ingest_orders($orders);
+    if (!isset($body['orders']) || !is_array($body['orders'])) {
+        return new WP_REST_Response([
+            'status' => 'error',
+            'message' => 'Invalid payload'
+        ], 400);
+    }
+
+    // 🔴 CRITICAL LINE
+    $count = nios_ingest_orders($body['orders']);
 
     return new WP_REST_Response([
         'status' => 'success',
-        'message' => 'Orders ingested',
-        'count' => count($orders),
+        'message' => 'Orders saved',
+        'count' => $count
     ], 200);
 }
 
-function nios_api_dashboard_all(WP_REST_Request $request) {
-    if (!nios_api_require_key($request)) {
-        return new WP_REST_Response(['status' => 'error', 'message' => 'Unauthorized'], 403);
-    }
-
-    $out = [];
-    foreach (nios_primary_states() as $state) {
-        $out[$state] = nios_state_dashboard_rows($state);
-    }
-
-    return new WP_REST_Response([
-        'status' => 'success',
-        'data' => $out,
-    ], 200);
-}
-
+/**
+ * ============================================
+ * DASHBOARD
+ * ============================================
+ */
 function nios_api_dashboard_state(WP_REST_Request $request) {
+
     if (!nios_api_require_key($request)) {
-        return new WP_REST_Response(['status' => 'error', 'message' => 'Unauthorized'], 403);
+        return new WP_REST_Response(['status' => 'error'], 403);
     }
 
-    $state = strtoupper(trim((string)$request['state']));
-    if (!in_array($state, nios_primary_states(), true)) {
-        return new WP_REST_Response(['status' => 'error', 'message' => 'Invalid state'], 400);
-    }
+    $state = strtoupper($request['state']);
+
+    $orders = nios_get_orders();
+
+    $filtered = array_values(array_filter($orders, function ($o) use ($state) {
+        return ($o['state'] ?? '') === $state;
+    }));
 
     return new WP_REST_Response([
         'status' => 'success',
-        'state' => $state,
-        'data' => nios_state_dashboard_rows($state),
-    ], 200);
-}
-
-function nios_api_debug_orders(WP_REST_Request $request) {
-    if (!nios_api_require_key($request)) {
-        return new WP_REST_Response(['status' => 'error', 'message' => 'Unauthorized'], 403);
-    }
-
-    $orders = array_map('nios_normalize_order', nios_get_orders());
-
-    return new WP_REST_Response([
-        'status' => 'success',
-        'data' => $orders,
+        'data' => $filtered
     ], 200);
 }
