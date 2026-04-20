@@ -1,0 +1,12 @@
+﻿{
+  "orders": [
+    {
+      "so_number": "TEST_PHASE2",
+      "customer": "TEST",
+      "creation_date": "2026-01-01",
+      "lines": [
+        { "product_name": "Test", "quantity": 1 }
+      ]
+    }
+  ]
+}
